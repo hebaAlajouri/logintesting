@@ -13,6 +13,7 @@ $message = []; // Ensure this is always an array
 if (isset($_POST['submit'])) {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
+    $phone_number = trim($_POST['phone_number']); // Capture phone number
     $pass = trim($_POST['pass']);
     $cpass = trim($_POST['cpass']);
 
@@ -30,6 +31,13 @@ if (isset($_POST['submit'])) {
         $message[] = '<p style="color: red;">Email is required!</p>';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message[] = '<p style="color: red;">Invalid email format!</p>';
+    }
+
+    // Validate Phone Number
+    if (empty($phone_number)) {
+        $message[] = '<p style="color: red;">Phone number is required!</p>';
+    } elseif (!preg_match("/^[0-9]{10,15}$/", $phone_number)) {
+        $message[] = '<p style="color: red;">Invalid phone number format! (Only numbers allowed, length 10-15)</p>';
     }
 
     // Validate Password
@@ -59,9 +67,9 @@ if (isset($_POST['submit'])) {
             // Hash the password
             $hashed_pass = password_hash($pass, PASSWORD_DEFAULT);
 
-            // Insert user into the database
-            $insert_user = $conn->prepare("INSERT INTO `users` (name, email, password) VALUES (?, ?, ?)");
-            $insert_user->execute([$name, $email, $hashed_pass]);
+            // Insert user into the database (phone_number column is used here)
+            $insert_user = $conn->prepare("INSERT INTO `users` (name, email, phone_number, password) VALUES (?, ?, ?, ?)");
+            $insert_user->execute([$name, $email, $phone_number, $hashed_pass]);
 
             $message[] = '<p style="color: green;">Registered successfully, login now!</p>';
         }
@@ -103,6 +111,7 @@ if (isset($_POST['submit'])) {
 
         <input type="text" name="name" required placeholder="Enter your username" maxlength="20" class="box" value="<?= htmlspecialchars($name ?? '') ?>">
         <input type="email" name="email" required placeholder="Enter your email" maxlength="50" class="box" value="<?= htmlspecialchars($email ?? '') ?>" oninput="this.value = this.value.replace(/\s/g, '')">
+        <input type="text" name="phone_number" required placeholder="Enter your phone number" maxlength="15" class="box" value="<?= htmlspecialchars($phone_number ?? '') ?>">
         <input type="password" name="pass" required placeholder="Enter your password" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
         <input type="password" name="cpass" required placeholder="Confirm your password" maxlength="20" class="box" oninput="this.value = this.value.replace(/\s/g, '')">
         <input type="submit" style="color:white;" value="Register Now" class="btn" name="submit">
@@ -111,6 +120,7 @@ if (isset($_POST['submit'])) {
         <a href="user_login.php" style="color:white;" class="option-btn">Login Now</a>
     </form>
 </section>
-
+<?php include 'components/footer.php'; ?>
+<script src="js/script.js"></script>
 </body>
 </html>
