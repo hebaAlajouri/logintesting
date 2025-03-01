@@ -1,6 +1,6 @@
 <?php
 
-$db_name = 'mysql:host=localhost;dbname=shop_db';
+$db_name = 'mysql:host=localhost;dbname=final eleca';
 $user_name = 'root';
 $user_password = '';
 
